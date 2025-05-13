@@ -1,0 +1,20 @@
+<!-- main-frontend/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Página Principal</title>
+</head>
+<body>
+  <h1>Bienvenido</h1>
+  <button onclick="openMessage(1)">Mensaje 1</button>
+  <button onclick="openMessage(2)">Mensaje 2</button>
+  <button onclick="openMessage(3)">Mensaje 3</button>
+  <button onclick="openMessage(4)">Mensaje 4</button>
+
+  <script>
+    function openMessage(num) {
+      window.open(`http://localhost:500${num}`, '_blank');
+    }
+  </script>
+</body>
+</html>
