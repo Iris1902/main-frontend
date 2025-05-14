@@ -1,19 +1,42 @@
-<!-- main-frontend/index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Página Principal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    .buttons {
+      margin: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>Bienvenido</h1>
-  <button onclick="openMessage(1)">Mensaje 1</button>
-  <button onclick="openMessage(2)">Mensaje 2</button>
-  <button onclick="openMessage(3)">Mensaje 3</button>
-  <button onclick="openMessage(4)">Mensaje 4</button>
+  <h1>Página Principal</h1>
+  <div class="buttons">
+    <button onclick="openMessage('https://mensaje-1-backend-production.up.railway.app/')">Mensaje 1 (Railway)</button>
+    <button onclick="openMessage('https://mensaje-2-backend.onrender.com/')">Mensaje 2 (Render)</button>
+    <button onclick="openMessage('https://mensaje3-vbje7.ondigitalocean.app/')">Mensaje 3 (DigitalOcean)</button>
+    <button onclick="openMessage('https://message-d56864c08f35.herokuapp.com/')">Mensaje 4 (Heroku)</button>
+  </div>
 
   <script>
-    function openMessage(num) {
-      window.open(`http://localhost:500${num}`, '_blank');
+    function openMessage(url) {
+      window.open(url, '_blank');
     }
   </script>
 </body>
