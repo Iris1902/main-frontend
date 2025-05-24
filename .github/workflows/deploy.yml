@@ -3,7 +3,7 @@ name: Deploy Node.js App to EC2
 on:
   push:
     branches:
-      - main
+      - main  # O la rama que uses
 
 jobs:
   deploy:
@@ -13,12 +13,7 @@ jobs:
     - name: 📥 Checkout del repositorio
       uses: actions/checkout@v3
 
-    - name: ⚙️ Configurar Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: 📡 Desplegar en EC2 vía SSH
+    - name: 📡 Desplegar contenedor Docker en EC2 vía SSH
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_HOST_MAIN_FRONTEND }}
@@ -26,8 +21,8 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          cd /home/ubuntu/main-frontend
-          git pull origin main
-          npm install
-          pm2 restart app || pm2 start app.js --name app
+          # Detener y borrar contenedor viejo si existe
+          docker rm -f main-frontend || true
 
+          # Ejecutar contenedor con la imagen actualizada
+          docker run -d --name main-frontend -p 80:80 ievinan/main-frontend:latest
