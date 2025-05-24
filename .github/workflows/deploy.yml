@@ -21,10 +21,17 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            # Liberar el puerto 80 si está en uso
+            # Mostrar procesos en el puerto 80
+            echo "Procesos que usan el puerto 80:"
+            sudo lsof -i :80 || true
+
+            # Forzar parada de cualquier contenedor que use el puerto 80
+            docker ps --format '{{.ID}} {{.Ports}}' | grep ':80->' | cut -d' ' -f1 | xargs -r docker rm -f || true
+
+            # También matar cualquier proceso del sistema que use el puerto 80
             sudo fuser -k 80/tcp || true
 
-            # Detener y borrar contenedor viejo si existe
+            # Asegurar que el contenedor viejo por nombre se elimine
             docker rm -f main-frontend || true
 
             # Descargar imagen actualizada
@@ -32,3 +39,4 @@ jobs:
 
             # Ejecutar contenedor con nueva imagen
             docker run -d --name main-frontend -p 80:80 ievinan/main-frontend:latest
+
