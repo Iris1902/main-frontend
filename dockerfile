@@ -1,8 +1,4 @@
-# Usa una imagen base de Nginx
 FROM nginx:alpine
-
-# Copia los archivos del frontend al directorio que Nginx sirve
-COPY . /usr/share/nginx/html
-
-# Expone el puerto 80 para acceder desde el navegador
+COPY ./index.html /usr/share/nginx/html/index.html
+COPY ./styles.css /usr/share/nginx/html/styles.css  # si tienes más archivos
 EXPOSE 80
