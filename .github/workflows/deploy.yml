@@ -1,4 +1,4 @@
-name: Deploy Node.js App to EC2
+name: Build & Deploy Node.js App to EC2
 
 on:
   push:
@@ -6,14 +6,27 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout del repositorio
         uses: actions/checkout@v3
 
-      - name: 📡 Desplegar contenedor Docker en EC2 vía SSH
+      # 🔐 Login to Docker Hub
+      - name: 🔐 Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      # 🛠️ Build the Docker image
+      - name: 🛠️ Build Docker image
+        run: docker build -t ievinan/main-frontend:latest .
+
+      # 📤 Push to Docker Hub
+      - name: 📤 Push image to Docker Hub
+        run: docker push ievinan/main-frontend:latest
+
+      # 🚀 Deploy to EC2
+      - name: 📡 Desplegar en EC2 vía SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST_MAIN_FRONTEND }}
@@ -21,22 +34,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            # Mostrar procesos en el puerto 80
-            echo "Procesos que usan el puerto 80:"
-            sudo lsof -i :80 || true
-
-            # Forzar parada de cualquier contenedor que use el puerto 80
             docker ps --format '{{.ID}} {{.Ports}}' | grep ':80->' | cut -d' ' -f1 | xargs -r docker rm -f || true
-
-            # También matar cualquier proceso del sistema que use el puerto 80
             sudo fuser -k 80/tcp || true
-
-            # Asegurar que el contenedor viejo por nombre se elimine
             docker rm -f main-frontend || true
-
-            # Descargar imagen actualizada
             docker pull ievinan/main-frontend:latest
-
-            # Ejecutar contenedor con nueva imagen
             docker run -d --name main-frontend -p 80:80 ievinan/main-frontend:latest
+
 
