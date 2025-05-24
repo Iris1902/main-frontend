@@ -1,23 +1,23 @@
 name: Deploy Node.js App to EC2
- 
+
 on:
   push:
     branches:
-      - main  # O la rama que uses
- 
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
- 
+
     steps:
     - name: 📥 Checkout del repositorio
       uses: actions/checkout@v3
- 
+
     - name: ⚙️ Configurar Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
- 
+
     - name: 📡 Desplegar en EC2 vía SSH
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -26,7 +26,8 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          cd /home/ec2-user/tu-proyecto
+          cd /home/ubuntu/main-frontend
           git pull origin main
           npm install
           pm2 restart app || pm2 start app.js --name app
+
