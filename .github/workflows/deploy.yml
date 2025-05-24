@@ -3,26 +3,32 @@ name: Deploy Node.js App to EC2
 on:
   push:
     branches:
-      - main  # O la rama que uses
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout del repositorio
-      uses: actions/checkout@v3
+      - name: 📥 Checkout del repositorio
+        uses: actions/checkout@v3
 
-    - name: 📡 Desplegar contenedor Docker en EC2 vía SSH
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.EC2_HOST_MAIN_FRONTEND }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        port: 22
-        script: |
-          # Detener y borrar contenedor viejo si existe
-          docker rm -f main-frontend || true
+      - name: 📡 Desplegar contenedor Docker en EC2 vía SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST_MAIN_FRONTEND }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            # Liberar el puerto 80 si está en uso
+            sudo fuser -k 80/tcp || true
 
-          # Ejecutar contenedor con la imagen actualizada
-          docker run -d --name main-frontend -p 80:80 ievinan/main-frontend:latest
+            # Detener y borrar contenedor viejo si existe
+            docker rm -f main-frontend || true
+
+            # Descargar imagen actualizada
+            docker pull ievinan/main-frontend:latest
+
+            # Ejecutar contenedor con nueva imagen
+            docker run -d --name main-frontend -p 80:80 ievinan/main-frontend:latest
